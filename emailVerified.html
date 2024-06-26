@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1c1c1c;
+            color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .icon {
+            font-size: 48px;
+            display: none;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 24px;
+            display: none;
+        }
+
+        .button-container {
+            margin-top: 30px;
+        }
+
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            outline: none;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .button-verify {
+            background-color: #28a745;
+        }
+
+        .button-verify:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon" id="icon"></div>
+        <div class="message" id="message">Waiting to verify...</div>
+        <div class="button-container">
+            <button class="button" onclick="goToLogin()">Go Back to Login</button>
+            <button class="button button-verify" onclick="verifyEmail()">Verify</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to go back to the login page and clear local storage
+        function goToLogin() {
+            // Redirect to the login page
+            window.location.href = 'login';
+            // Clear local storage
+            localStorage.clear();
+        }
+
+        // Function to get query parameter value by name
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Function to verify the email
+        async function verifyEmail() {
+            const email = getQueryParam('email');
+            if (!email) {
+                alert('Email is required to verify.');
+                return;
+            }
+            console.log(`Verifying email: ${email}`);  // Logging the email being verified
+
+            const icon = document.getElementById('icon');
+            const message = document.getElementById('message');
+            message.style.display = 'block';  // Show the message element
+
+            try {
+                const response = await fetch(`validate?email=${encodeURIComponent(email)}`, {
+                    method: 'POST'
+                });
+
+                // Check if the response is JSON or not
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    const data = await response.json();
+
+                    if (data.message === 'Email verified successfully') {
+                        icon.textContent = '✅';
+                        icon.style.color = 'green';
+                        message.textContent = 'Email verified successfully!';
+                    } else {
+                        icon.textContent = '❌';
+                        icon.style.color = 'red';
+                        message.textContent = data.message || 'Verification failed';
+                    }
+                } else {
+                    // Handle the case where the response is not JSON (e.g., HTML error page)
+                    const text = await response.text();
+                    console.error('Unexpected response:', text);
+                    icon.textContent = '❌';
+                    icon.style.color = 'red';
+                    message.textContent = 'Unexpected response from the server';
+                }
+            } catch (error) {
+                icon.textContent = '❌';
+                icon.style.color = 'red';
+                message.textContent = 'Failed to verify email';
+                console.error('Error verifying email:', error);
+            } finally {
+                icon.style.display = 'block';  // Always show the icon after attempting verification
+            }
+        }
+    </script>
+</body>
+</html>

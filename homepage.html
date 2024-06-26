@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            display: none; /* Hide container initially */
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #ff4500; /* Orange accent color */
+            font-size: 32px; /* Increased font size */
+            font-weight: 600;
+            transition: color 0.3s ease; /* Header text color animation */
+            text-align: center; /* Center align the text */
+        }
+
+        h2:hover {
+            color: #ff5e33; /* Brighter shade on hover */
+        }
+
+        .profile-info {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 500;
+            font-size: 18px; /* Increased font size */
+            display: block; /* Ensures label is on a separate line */
+            text-align: left; /* Align labels to the left */
+        }
+
+        p {
+            margin-top: 5px;
+            font-size: 16px; /* Increased font size */
+            text-align: left; /* Align paragraphs to the left */
+        }
+
+        .logout-btn {
+            background-color: #ff4500;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease; /* Logout button background color animation */
+            animation: pulse 2s infinite alternate; /* Logout button animation */
+        }
+
+        .logout-btn:hover {
+            background-color: #ff5e33;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #ff4500;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .change-password-btn, .generate-qr-btn {
+            background-color: #ff4500;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease; /* Button background color animation */
+            margin-bottom: 10px; /* Added margin to separate buttons */
+        }
+
+        .change-password-btn:hover, .generate-qr-btn:hover {
+            background-color: #ff5e33;
+        }
+
+        .verification-status {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .unverified {
+            color: red;
+        }
+
+        .verified {
+            color: green;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #errorMessage {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="spinner-container">
+        <div class="spinner"></div> <!-- Loading spinner -->
+    </div>
+    <div class="container">
+        <h2>User Profile</h2>
+        <div class="profile-info" id="profile-info">
+            <!-- User information will be dynamically inserted here -->
+        </div>
+        <button class="change-password-btn" id="change-password-btn">Change Password</button>
+        <button class="logout-btn" id="logout-btn">Logout</button>
+        <button class="generate-qr-btn" onclick="generateQRCode()">Generate QR Code for 2FA</button>
+        <div id="errorMessage"></div>
+    </div>
+
+    <script>
+        // Function to delay page load and display loading spinner
+        function delayAndShowSpinner() {
+            // Show spinner for 3 seconds
+            setTimeout(function() {
+                // Hide spinner and display container after 3 seconds
+                document.querySelector('.spinner-container').style.display = 'none';
+                document.querySelector('.container').style.display = 'block';
+            }, 3000);
+        }
+
+        // Decode JWT token and display user information
+        function displayUserInfo(token) {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const userInfo = document.getElementById('profile-info');
+            const verificationStatus = decodedToken.verified ? 'Verified' : 'Unverified';
+            const verificationClass = decodedToken.verified ? 'verified' : 'unverified';
+
+            userInfo.innerHTML = `
+                <label for="full_name">Full Name:</label>
+                <p id="full_name">${decodedToken.full_name}</p>
+                <label for="username">Username:</label>
+                <p id="username">${decodedToken.username}</p>
+                <label for="email">Email:</label>
+                <p id="email">${decodedToken.email}<span class="verification-status ${verificationClass}">${verificationStatus}</span></p>
+                <label for="phone">Phone Number:</label>
+                <p id="phone">${decodedToken.phone}</p>
+            `;
+        }
+
+        // Logout function
+        function logout() {
+            // Clear JWT token from local storage
+            localStorage.removeItem('token');
+            // Redirect to login page
+            window.location.href = 'login';
+        }
+
+        // Redirect to change password page
+        function changePassword() {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            window.location.href = 'changepassword?email=' + encodeURIComponent(decodedToken.email);
+        }
+
+        // Function to generate QR code for 2FA
+        function generateQRCode() {
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const username = decodedToken.username;
+            const qrCodeUrl = `generate-qr-code?username=${encodeURIComponent(username)}`;
+            window.location.href = qrCodeUrl;
+        }
+
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (token) {
+            // If token exists, display user information after spinner delay
+            delayAndShowSpinner();
+            displayUserInfo(token);
+        } else {
+            // If token does not exist, redirect to login page
+            window.location.href = 'login';
+        }
+
+        // Add click event listener to logout button
+        document.getElementById('logout-btn').addEventListener('click', logout);
+        // Add click event listener to change password button
+        document.getElementById('change-password-btn').addEventListener('click', changePassword);
+    </script>
+</body>
+</html>

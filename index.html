@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212; /* Dark background */
+            color: #ffffff; /* Light text color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 400px;
+            padding: 40px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background */
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Box shadow for a sleek look */
+        }
+
+        h2 {
+            font-size: 36px;
+            color: #ff4500; /* Orange accent color */
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            color: #ccc; /* Light gray text color */
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #ffffff;
+            background-color: #ff4500; /* Orange accent color */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            outline: none;
+        }
+
+        button:hover {
+            background-color: #ff5e33; /* Darker shade of orange on hover */
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .button-container a:first-child button {
+            margin-right: 20px;
+        }
+
+        .button-container a:last-child button {
+            margin-left: 20px;
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+    <script type='text/javascript' src="/config.js"> </script> <!-- Include the config.js file -->
+
+</head>
+<body>
+    <div class="container">
+        <h2>Welcome to Our Website</h2>
+        <p>Please choose an option:</p>
+        <div class="button-container">
+            <!-- Add an identifier for JavaScript to target -->
+            <a id="registerButton" href="#"><button>Register</button></a>
+            <a id="loginButton" href="#"><button>Login</button></a>
+        </div>
+    </div>
+
+    <script>
+        // Get the base URL dynamically
+        var baseURL = 'api';
+        // Update the href attributes of the anchor tags
+        document.getElementById('registerButton').href = baseURL + '/register';
+        document.getElementById('loginButton').href = baseURL + '/login';
+    </script>
+</body>
+</html>
+
